@@ -57,10 +57,10 @@ def logout_user(request):
 def homepage(request):
     products = Product.objects.all().order_by('-id')[:8]
     user = request.user
-    items = Cart.objects.filter(user=user)
+    # items = Cart.objects.filter(user=user)
     context = {
         'products':products,
-        'items':items
+    
     }
     return render(request, 'users/index.html',context)
 

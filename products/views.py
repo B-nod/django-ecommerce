@@ -194,7 +194,7 @@ def order_item_form(request,product_id,cart_id):
                 messages.add_message(request,messages.SUCCESS,'Order Successful')
                 return redirect('/products/my_order')
 
-            elif order.paymet_method == 'Esewa':
+            elif order.payment_method == 'Esewa':
                 context={
                     'order':order,
                     'cart': cart_item

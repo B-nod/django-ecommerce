@@ -1,6 +1,4 @@
 from dataclasses import fields
-import imp
-from pyexpat import model
 import django_filters
 from products.models import *
 from django_filters import CharFilter
