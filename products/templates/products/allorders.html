@@ -55,7 +55,7 @@
                         <td><img src="/{{i.product.image}}" alt="" width="240" height="150"></td>
                         <td>{{ i.created_date }}</td>
                         <td>{{i.status}}</td>
-                        <td>{{i.payment_status}}</td>
+                        <td>Using {{i.payment_method}} ({%if i.payment_status == True %} Payment Completed {% else %} Not paid{% endif %})  </td>
                         <td>
                             <a href="#" class="btn btn-primary">
                                 <i class="fas fa-pen-square"></i>

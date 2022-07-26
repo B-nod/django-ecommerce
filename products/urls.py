@@ -16,6 +16,8 @@ urlpatterns=[
     path('deletecartitems/<int:cart_id>', views.remove_cart_item),
     path('orderitemform/<int:product_id>/<int:cart_id>', views.order_item_form),
     path('esewa_verify',views.esewa_verify),
+    path('khalti_request', views.khalti_request),
+    path('khalti_verify', views.khalti_verify),
     path('my_order',views.my_order),
     path('allorder',views.all_order),
 ]

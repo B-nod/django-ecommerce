@@ -2,13 +2,14 @@ from email import message
 from multiprocessing import context
 from tabnanny import check
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from numpy import prod
 from .models import *
 from .forms import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from users.auth import admin_only
+from django.http import JsonResponse
 
 # Create your views here.
 @login_required
@@ -200,6 +201,13 @@ def order_item_form(request,product_id,cart_id):
                     'cart': cart_item
                 }
                 return render(request,'users/esewa_payment.html',context)
+
+            elif order.payment_method == 'Khalti':
+                context={
+                    'order':order,
+                    'cart': cart_item
+                }
+                return render(request,'users/khaltirequest.html',context)
             else:
                 message.add_message(request,messages.ERROR,'Something went wrong')
                 return render(request,'users/orderform.html',context)
@@ -259,3 +267,40 @@ def all_order(request):
     return render(request,'products/allorders.html',context)
 
 
+def khalti_request(request):
+   o_id = request.GET.get("o_id")
+   order = Order.objects.get(id=o_id)
+   context = {
+    "order": order
+   }
+   return render(request, "khaltirequest.html", context)
+
+import requests
+def khalti_verify(request):
+    token = request.GET.get("token")
+    amount = request.GET.get("amount")
+    o_id = request.GET.get("order_id")
+    print(token, amount, o_id)
+
+    url = "https://khalti.com/api/v2/payment/verify/"
+    payload = {
+    "token": token,
+    "amount": amount
+    }
+    headers = {
+    "Authorization": "Key test_secret_key_bc4da36aa89947f098cf60b00884f950"
+    }
+    order_obj = Order.objects.get(id=o_id)
+    response = requests.post(url, payload, headers = headers)
+    resp_dict = response.json()
+    if resp_dict.get("idx"):
+        success = True
+        order_obj.payment_status = True
+        order_obj.save()
+    else:
+        success = False
+        
+    data = {
+        "success": success
+    } 
+    return JsonResponse(data)

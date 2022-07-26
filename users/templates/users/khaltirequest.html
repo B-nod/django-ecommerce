@@ -1,0 +1,96 @@
+<style>
+    .carousel-item img {
+        height: 450px;
+    }
+
+    .card-img {
+        overflow: hidden;
+    }
+
+    .card-img:hover img {
+        transform: scale(1.5);
+    }
+
+    .card-img img {
+        transition: all 2s;
+    }
+</style>
+
+{% extends 'layout.html' %}
+{% load static %}
+{% block title %}
+<title>E-commerce - Khalti Payment</title>
+{% endblock%}
+
+{% block main_content %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1 class="text-center">You are being redirect to Khalti. Please wait......</h1>
+            <h3>Your order amount is Rs. {{order.total_price}}</h3>
+            <div class="card p-2">
+                
+              <button id="payment-button" class="btn bg-info">Pay with Khalti</button>
+               
+              
+                <!-- Place this where you need payment button -->
+                <!-- Paste this code anywhere in you body tag -->
+                <script>
+                    var config = {
+                        // replace the publicKey with yours
+                        "publicKey": "test_public_key_dd9d01e42af041d3b93e0ef17dc53dd6",
+                        "productIdentity": "order_{{order.id}}",
+                        "productName": "order_{{order.id}}",
+                        "productUrl": "http://localhost:8000",
+                        "paymentPreference": [
+                            "KHALTI",
+                            "EBANKING",
+                            "MOBILE_BANKING",
+                            "CONNECT_IPS",
+                            "SCT",
+                            ],
+                        "eventHandler": {
+                            onSuccess (payload) {
+                                // hit merchant api for initiating verfication
+                                axios.get("/products/khalti_verify", {
+                                    params: {
+                                        "token": payload.token,
+                                        "amount": payload.amount,
+                                        "order_id": "{{order.id}}"
+                                    }
+                                }).then(function(resp){
+                                    if(resp.data.success == true){
+                                        alert("Thanks. Payment Completed Successfully.")
+                                        location.href = "/products/mycart"
+                                    }else{
+                                        alert("Sorry. Error occured")
+                                        location.href = "{{ request.build_absolute }}"
+                                    }
+                                })
+                                
+                            },
+                            onError (error) {
+                                console.log(error);
+                            },
+                            onClose () {
+                                console.log('widget is closing');
+                            }
+                        }
+                    };
+            
+                    var checkout = new KhaltiCheckout(config);
+                    var btn = document.getElementById("payment-button");
+                    btn.onclick = function () {
+                        // minimum transaction amount must be 10, i.e 1000 in paisa.
+                        checkout.show({amount: {{order.total_price}}*100});
+                    }
+
+                    
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock%}
