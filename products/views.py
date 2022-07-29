@@ -296,7 +296,7 @@ def khalti_verify(request):
     if resp_dict.get("idx"):
         success = True
         order_obj.payment_status = True
-        order_obj.save()
+        order_obj.save() 
     else:
         success = False
         
